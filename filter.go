@@ -13,7 +13,7 @@ func (e *excelExporter) SetSheetFilter(enabled bool) (err error) {
 		return errors.New("sheet not found")
 	}
 
-	sheet.WithFilter = enabled
+	sheet.withFilter = enabled
 	e.sheets[e.workingSheetName] = sheet
 
 	return
@@ -21,11 +21,11 @@ func (e *excelExporter) SetSheetFilter(enabled bool) (err error) {
 
 func (e *excelExporter) AddFilter() (err error) {
 	sheet := e.sheets[e.workingSheetName]
-	if len(sheet.ConfigFields) == 0 {
+	if len(sheet.configFields) == 0 {
 		return
 	}
 
-	lastCol, _ := excelize.ColumnNumberToName(len(sheet.ConfigFields))
+	lastCol, _ := excelize.ColumnNumberToName(len(sheet.configFields))
 	rangeRef := fmt.Sprintf("A1:%s1", lastCol)
 
 	err = e.xlsx.AutoFilter(e.workingSheetName, rangeRef, []excelize.AutoFilterOptions{})

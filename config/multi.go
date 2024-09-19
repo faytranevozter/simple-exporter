@@ -3,7 +3,7 @@ package config
 func DefaultMultipleConfig() OptSheet {
 	return OptSheet{
 		SheetOpt: []Opts{
-			DefaultConfig(),
+			DefaultConfig(0),
 		},
 		withStyle:  false,
 		withFilter: false,
@@ -18,7 +18,7 @@ func WithSheetHeaders(headers ...[]FieldConfig) func(*OptSheet) {
 
 		for i, fieldConfigs := range headers {
 			if len(o.SheetOpt) < (i + 1) {
-				o.SheetOpt = append(o.SheetOpt, DefaultConfig())
+				o.SheetOpt = append(o.SheetOpt, DefaultConfig(i))
 			}
 
 			o.SheetOpt[i].ConfigFields = fieldConfigs
@@ -34,7 +34,7 @@ func WithSheetNames(sheetNames ...string) func(*OptSheet) {
 
 		for i, sheetName := range sheetNames {
 			if len(o.SheetOpt) < (i + 1) {
-				o.SheetOpt = append(o.SheetOpt, DefaultConfig())
+				o.SheetOpt = append(o.SheetOpt, DefaultConfig(i))
 			}
 
 			o.SheetOpt[i].SheetName = sheetName
@@ -50,7 +50,7 @@ func WithSheetStyles(enables ...bool) func(o *OptSheet) {
 
 		for i, enabled := range enables {
 			if len(o.SheetOpt) < (i + 1) {
-				o.SheetOpt = append(o.SheetOpt, DefaultConfig())
+				o.SheetOpt = append(o.SheetOpt, DefaultConfig(i))
 			}
 
 			o.SheetOpt[i].WithStyle = enabled
@@ -66,7 +66,7 @@ func WithSheetFilters(enables ...bool) func(o *OptSheet) {
 
 		for i, enabled := range enables {
 			if len(o.SheetOpt) < (i + 1) {
-				o.SheetOpt = append(o.SheetOpt, DefaultConfig())
+				o.SheetOpt = append(o.SheetOpt, DefaultConfig(i))
 			}
 
 			o.SheetOpt[i].WithFilter = enabled

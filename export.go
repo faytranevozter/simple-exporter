@@ -47,16 +47,16 @@ func (e *excelExporter) Save(filepath string) (err error) {
 
 func (e *excelExporter) _preRender() (err error) {
 	for _, sheet := range e.sheets {
-		e.SetActiveSheet(sheet.SheetName)
+		e.SetActiveSheet(sheet.sheetName)
 
 		// add header
-		err = e._SetHeader(sheet.ConfigFields)
+		err = e._SetHeader(sheet.configFields)
 		if err != nil {
 			return
 		}
 
 		// add style if needed
-		if sheet.WithStyle {
+		if sheet.withStyle {
 			err = e.AddStyle()
 			if err != nil {
 				return
@@ -64,7 +64,7 @@ func (e *excelExporter) _preRender() (err error) {
 		}
 
 		// add filter if needed
-		if sheet.WithFilter {
+		if sheet.withFilter {
 			err = e.AddFilter()
 			if err != nil {
 				return

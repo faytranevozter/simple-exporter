@@ -7,7 +7,7 @@ import (
 
 func NewExporter(opts ...config.OptFunc) Exporter {
 
-	option := config.DefaultConfig()
+	option := config.DefaultConfig(0)
 
 	for _, fn := range opts {
 		fn(&option)
@@ -20,14 +20,32 @@ func NewExporter(opts ...config.OptFunc) Exporter {
 
 	activeSheetIndex := xlsx.GetActiveSheetIndex()
 
+	fields := make([]Field, 0)
+	for _, field := range option.ConfigFields {
+		fields = append(fields, Field{
+			Key:                field.Key,
+			Label:              field.Label,
+			As:                 field.As,
+			Default:            field.Default,
+			DateFormat:         field.DateFormat,
+			DateFormatLocation: field.DateFormatLocation,
+			DateParseLayout:    field.DateParseLayout,
+			DateParseLocation:  field.DateParseLocation,
+			LongestChar:        0,
+		})
+	}
+
 	return &excelExporter{
 		xlsx:              xlsx,
 		workingSheetName:  option.SheetName,
 		workingSheetIndex: activeSheetIndex,
 		sheets: map[string]Sheet{
 			option.SheetName: {
-				index: activeSheetIndex,
-				Opts:  option,
+				index:        0,
+				configFields: fields,
+				withStyle:    option.WithStyle,
+				withFilter:   option.WithFilter,
+				sheetName:    option.SheetName,
 			},
 		},
 	}
@@ -59,9 +77,27 @@ func NewExporterMultiSheet(sheetOpts ...config.SheetOptFunc) Exporter {
 			exp.xlsx.NewSheet(opt.SheetName)
 		}
 
+		fields := make([]Field, 0)
+		for _, field := range opt.ConfigFields {
+			fields = append(fields, Field{
+				Key:                field.Key,
+				Label:              field.Label,
+				As:                 field.As,
+				Default:            field.Default,
+				DateFormat:         field.DateFormat,
+				DateFormatLocation: field.DateFormatLocation,
+				DateParseLayout:    field.DateParseLayout,
+				DateParseLocation:  field.DateParseLocation,
+				LongestChar:        0,
+			})
+		}
+
 		exp.sheets[opt.SheetName] = Sheet{
-			index: i,
-			Opts:  opt,
+			index:        i,
+			configFields: fields,
+			withStyle:    opt.WithStyle,
+			withFilter:   opt.WithFilter,
+			sheetName:    opt.SheetName,
 		}
 	}
 

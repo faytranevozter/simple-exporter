@@ -1,6 +1,8 @@
 package exporter
 
 import (
+	"time"
+
 	"github.com/faytranevozter/simple-exporter/config"
 	"github.com/xuri/excelize/v2"
 )
@@ -10,6 +12,7 @@ type Exporter interface {
 	SetSheetStyle(enabled bool) (err error)
 	SetSheetFilter(enabled bool) (err error)
 	SetActiveSheet(sheetName string) (err error)
+	SetActiveSheetIndex(index int) (err error)
 	AddRow(mapData map[string]any) (err error)
 	AddSheet(sheetName string, setActive bool) (err error)
 	RenameSheet(newSheetName string) (err error)
@@ -18,9 +21,24 @@ type Exporter interface {
 }
 
 type Sheet struct {
-	index      int
-	currentRow int
-	config.Opts
+	index        int
+	currentRow   int
+	configFields []Field
+	withStyle    bool
+	withFilter   bool
+	sheetName    string
+}
+
+type Field struct {
+	Key                string
+	Label              string
+	As                 string
+	Default            string
+	DateFormat         string
+	DateFormatLocation *time.Location
+	DateParseLayout    string
+	DateParseLocation  *time.Location
+	LongestChar        int
 }
 
 type excelExporter struct {

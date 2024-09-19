@@ -11,5 +11,5 @@ type FieldConfig struct {
 	DateFormatLocation *time.Location
 	DateParseLayout    string
 	DateParseLocation  *time.Location
-	LongestChar        int
+	// LongestChar        int
 }

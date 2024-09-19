@@ -2,11 +2,9 @@ package exporter
 
 import (
 	"time"
-
-	"github.com/faytranevozter/simple-exporter/config"
 )
 
-func (e *excelExporter) Cast(value any, fieldConfig config.FieldConfig) any {
+func (e *excelExporter) Cast(value any, fieldConfig Field) any {
 	if fieldConfig.As == "boolean" || fieldConfig.As == "bool" {
 		if v, ok := value.(bool); ok {
 			if v {

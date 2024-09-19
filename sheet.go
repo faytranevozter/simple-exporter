@@ -2,8 +2,6 @@ package exporter
 
 import (
 	"errors"
-
-	"github.com/faytranevozter/simple-exporter/config"
 )
 
 func (e *excelExporter) AddSheet(sheetName string, setActive bool) (err error) {
@@ -13,13 +11,11 @@ func (e *excelExporter) AddSheet(sheetName string, setActive bool) (err error) {
 	}
 
 	e.sheets[sheetName] = Sheet{
-		index: idx,
-		Opts: config.Opts{
-			ConfigFields: []config.FieldConfig{},
-			WithStyle:    false,
-			WithFilter:   false,
-			SheetName:    sheetName,
-		},
+		index:        idx,
+		configFields: []Field{},
+		withStyle:    false,
+		withFilter:   false,
+		sheetName:    sheetName,
 	}
 
 	if setActive {
@@ -42,6 +38,25 @@ func (e *excelExporter) SetActiveSheet(sheetName string) (err error) {
 	return
 }
 
+func (e *excelExporter) SetActiveSheetIndex(index int) (err error) {
+	sheet := Sheet{}
+	for _, sh := range e.sheets {
+		if sh.index == index {
+			sheet = sh
+		}
+	}
+
+	if sheet.sheetName == "" {
+		return errors.New("sheet not found")
+	}
+
+	e.xlsx.SetActiveSheet(sheet.index)
+	e.workingSheetName = sheet.sheetName
+	e.workingSheetIndex = sheet.index
+
+	return
+}
+
 func (e *excelExporter) RenameSheet(newSheetName string) (err error) {
 	oldName := e.workingSheetName
 
@@ -59,7 +74,7 @@ func (e *excelExporter) RenameSheet(newSheetName string) (err error) {
 		return err
 	}
 
-	sheet.SheetName = newSheetName
+	sheet.sheetName = newSheetName
 	e.sheets[newSheetName] = sheet
 	e.workingSheetName = newSheetName
 

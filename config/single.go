@@ -1,10 +1,12 @@
 package config
 
-func DefaultConfig() Opts {
+import "fmt"
+
+func DefaultConfig(i int) Opts {
 	return Opts{
 		ConfigFields: []FieldConfig{},
 		WithStyle:    false,
-		SheetName:    "Sheet1",
+		SheetName:    fmt.Sprintf("Sheet%d", i+1),
 	}
 }
 

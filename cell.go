@@ -13,19 +13,37 @@ func (e *excelExporter) SetSheetHeader(configFields []config.FieldConfig) (err e
 	if !ok {
 		return errors.New("sheet not found")
 	}
-	sheet.ConfigFields = configFields
+
+	sheet.configFields = make([]Field, 0)
+	for _, field := range configFields {
+		sheet.configFields = append(sheet.configFields, Field{
+			Key:                field.Key,
+			Label:              field.Label,
+			As:                 field.As,
+			Default:            field.Default,
+			DateFormat:         field.DateFormat,
+			DateFormatLocation: field.DateFormatLocation,
+			DateParseLayout:    field.DateParseLayout,
+			DateParseLocation:  field.DateParseLocation,
+			LongestChar:        0,
+		})
+	}
+
 	e.sheets[e.workingSheetName] = sheet
 
 	return
 }
 
-func (e *excelExporter) _SetHeader(configFields []config.FieldConfig) (err error) {
+func (e *excelExporter) _SetHeader(configFields []Field) (err error) {
+	sheet, ok := e.sheets[e.workingSheetName]
+	if !ok {
+		return errors.New("sheet not found")
+	}
 
-	sheet := e.sheets[e.workingSheetName]
-	sheet.ConfigFields = configFields
+	sheet.configFields = configFields
 
 	// header
-	for i, fieldConfig := range sheet.ConfigFields {
+	for i, fieldConfig := range sheet.configFields {
 		// get cell name
 		col, _ := excelize.CoordinatesToCellName(i+1, 1)
 
@@ -34,7 +52,7 @@ func (e *excelExporter) _SetHeader(configFields []config.FieldConfig) (err error
 
 		// set longest char
 		if len(fieldConfig.Label) > fieldConfig.LongestChar {
-			sheet.ConfigFields[i].LongestChar = len(fieldConfig.Label)
+			sheet.configFields[i].LongestChar = len(fieldConfig.Label)
 		}
 	}
 
@@ -44,11 +62,17 @@ func (e *excelExporter) _SetHeader(configFields []config.FieldConfig) (err error
 }
 
 func (e *excelExporter) AddRow(mapData map[string]any) (err error) {
+	sheet, ok := e.sheets[e.workingSheetName]
+	if !ok {
+		return errors.New("sheet not found")
+	}
 
-	sheet := e.sheets[e.workingSheetName]
+	if len(sheet.configFields) == 0 {
+		return errors.New("header not found")
+	}
 
 	rowValues := make([]any, 0)
-	for _, fieldConfig := range sheet.ConfigFields {
+	for _, fieldConfig := range sheet.configFields {
 		var cellValue any
 
 		// get from mapData
@@ -67,12 +91,12 @@ func (e *excelExporter) AddRow(mapData map[string]any) (err error) {
 	e.xlsx.SetSheetRow(e.workingSheetName, fmt.Sprintf("A%d", (2+sheet.currentRow)), &rowValues)
 
 	// set longest char
-	for i, fieldConfig := range sheet.ConfigFields {
+	for i, fieldConfig := range sheet.configFields {
 		col, _ := excelize.CoordinatesToCellName(i+1, (2 + sheet.currentRow))
 		val, _ := e.xlsx.GetCellValue(e.workingSheetName, col)
 
 		if len(val) > fieldConfig.LongestChar {
-			sheet.ConfigFields[i].LongestChar = len(val)
+			sheet.configFields[i].LongestChar = len(val)
 		}
 	}
 

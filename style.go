@@ -12,7 +12,7 @@ func (e *excelExporter) SetSheetStyle(enabled bool) (err error) {
 		return errors.New("sheet not found")
 	}
 
-	sheet.WithStyle = enabled
+	sheet.withStyle = enabled
 	e.sheets[e.workingSheetName] = sheet
 
 	return
@@ -40,14 +40,14 @@ func (e *excelExporter) AddStyle() (err error) {
 		return
 	}
 
-	lastHeaderCol, _ := excelize.CoordinatesToCellName(len(sheet.ConfigFields), 1)
+	lastHeaderCol, _ := excelize.CoordinatesToCellName(len(sheet.configFields), 1)
 	e.xlsx.SetCellStyle(e.workingSheetName, "A1", lastHeaderCol, style)
 
 	// set column width
-	for i, fieldConfig := range sheet.ConfigFields {
+	for i, fieldConfig := range sheet.configFields {
 		// get cell name
 		colName, _ := excelize.ColumnNumberToName(i + 1)
-		e.xlsx.SetColWidth(e.workingSheetName, colName, colName, float64(fieldConfig.LongestChar)*1.2)
+		e.xlsx.SetColWidth(e.workingSheetName, colName, colName, float64(fieldConfig.LongestChar))
 	}
 
 	return
