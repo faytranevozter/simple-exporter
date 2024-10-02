@@ -17,7 +17,9 @@ func (e *excelExporter) Cast(value any, fieldConfig Field) any {
 
 	if fieldConfig.As == "date" {
 
-		if t, ok := value.(*time.Time); ok && t == nil {
+		if t, ok := value.(time.Time); ok && t.IsZero() {
+			return fieldConfig.Default
+		} else if t, ok := value.(*time.Time); ok && t == nil {
 			return fieldConfig.Default
 		}
 
@@ -36,6 +38,8 @@ func (e *excelExporter) Cast(value any, fieldConfig Field) any {
 		}
 
 		if t, ok := value.(time.Time); ok {
+			return t.In(fieldConfig.DateFormatLocation).Format(fieldConfig.DateFormat)
+		} else if t, ok := value.(*time.Time); ok {
 			return t.In(fieldConfig.DateFormatLocation).Format(fieldConfig.DateFormat)
 		}
 
